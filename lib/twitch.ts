@@ -1,8 +1,15 @@
 import { randomId } from "./id.ts";
+import { APP_BASE_PATH, appRoot } from "./hosting.ts";
 export type TwitchMessage = { id: string; user: string; text: string };
 export type TwitchStatus = "connecting" | "connected" | "reconnecting" | "disconnected";
 export const TWITCH_SCOPE = "user:read:chat";
 const WS_URL = "wss://eventsub.wss.twitch.tv/ws";
+
+export function twitchAuthorizationUrl(clientId: string, redirectUri: string, state: string): string {
+  const url = new URL("https://id.twitch.tv/oauth2/authorize");
+  url.search = new URLSearchParams({ client_id: clientId, redirect_uri: redirectUri, response_type: "token", scope: TWITCH_SCOPE, state }).toString();
+  return url.href;
+}
 
 export function authorizeTwitch(clientId: string) {
   if (!/^[a-zA-Z0-9]{10,64}$/.test(clientId)) throw new Error("Enter the client ID from your registered Twitch application.");
@@ -10,19 +17,17 @@ export function authorizeTwitch(clientId: string) {
   sessionStorage.setItem("pp-oauth-state", state);
   sessionStorage.setItem("pp-oauth-start", String(Date.now()));
   localStorage.setItem("pp-client-id", clientId);
-  const url = new URL("https://id.twitch.tv/oauth2/authorize");
-  url.search = new URLSearchParams({ client_id: clientId, redirect_uri: `${location.origin}/`, response_type: "token", scope: TWITCH_SCOPE, state }).toString();
-  location.assign(url.toString());
+  location.assign(twitchAuthorizationUrl(clientId, appRoot(), state));
 }
 
 /** Token remains in memory. Never persist it or send it to the app server. */
 export function consumeTwitchCallback(): string | null {
   const params = new URLSearchParams(location.hash.slice(1));
   const query = new URLSearchParams(location.search);
-  if (query.has("error")) { history.replaceState(null, "", "/"); throw new Error("Twitch authorization was cancelled. Demo mode is still available."); }
+  if (query.has("error")) { history.replaceState(null, "", APP_BASE_PATH); throw new Error("Twitch authorization was cancelled. Demo mode is still available."); }
   const token = params.get("access_token");
   if (!token) return null;
-  history.replaceState(null, "", "/");
+  history.replaceState(null, "", APP_BASE_PATH);
   const expected = sessionStorage.getItem("pp-oauth-state"), started = Number(sessionStorage.getItem("pp-oauth-start") || 0);
   sessionStorage.removeItem("pp-oauth-state"); sessionStorage.removeItem("pp-oauth-start");
   if (!expected || params.get("state") !== expected || Date.now() - started > 600_000) throw new Error("Twitch authorization could not be verified. Please connect again.");

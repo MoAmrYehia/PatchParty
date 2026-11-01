@@ -4,8 +4,8 @@ from pathlib import Path
 import zipfile
 
 root = Path(__file__).resolve().parent.parent
-folders = {'app', 'lib', 'db', 'drizzle', 'worker', 'scripts', 'public', 'vendor', 'docs'}
-files = {'package.json', 'pnpm-lock.yaml', 'vite.config.ts', 'tsconfig.json', 'cloudflare-env.d.ts', 'drizzle.config.ts', 'next.config.ts', 'next.config.mjs', 'postcss.config.mjs', 'eslint.config.mjs', 'README.md', '.gitignore', 'LICENSE', 'NOTICE.md'}
+folders = {'app', 'lib', 'db', 'drizzle', 'worker', 'scripts', 'public', 'vendor', 'docs', 'tests', 'components', 'hooks', 'github-pages', '.github'}
+files = {'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', '.npmrc', 'components.json', 'vite.config.ts', 'vite.github-pages.config.ts', 'tsconfig.json', 'cloudflare-env.d.ts', 'drizzle.config.ts', 'next.config.ts', 'next.config.mjs', 'postcss.config.mjs', 'eslint.config.mjs', 'README.md', '.gitignore', 'LICENSE', 'NOTICE.md'}
 output = root / 'public' / 'patch-party-source.zip'
 with zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as archive:
     candidates = [root / name for name in files if (root / name).is_file()]

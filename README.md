@@ -19,6 +19,12 @@ The streamer approves every change. No viewer command executes arbitrary code. T
 - Run recap and JSON export; best score is a device-local preference.
 - Keyboard and touch input, reduced motion, optional sound, modal focus trap, and responsive layout.
 
+## GitHub Pages
+
+The project includes a static build for GitHub Pages. Run `pnpm build:pages`; the deployable files are in `dist/github-pages/`. The publishing branch is `gh-pages`. See [GitHub Pages setup](docs/GITHUB_PAGES.md) for the one-time repository setting, deployment steps, and Twitch redirect URL.
+
+On Pages, the game and Twitch connection run in the browser. Stage view uses another window in the same browser profile. The full server-hosted version also supports a D1 relay across profiles.
+
 ## Local development
 
 Use Node **24** and pnpm (the checked-in lockfile is authoritative).
